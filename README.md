@@ -1,2 +1,22 @@
 # arpwatch-cpp
-A (partial) port of arpwatch to C++
+A port of arpwatch to C++.
+
+## Repository Structure
+
+This repo is a CMake project, structured as follows.
+
+1. A top level `CMakeLists.txt` file for the entire project.
+2. The `src` directory containing the source code implementations of `arpwatch` and a `CMakeLists.txt` file that is called by the outer `CMakeLists.txt` file.
+3. The `include` directory containing the header files used by the source code in `src`.
+
+## Build Instructions
+
+To build this project, run
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build . --target install
+./arpwatch  
+```
