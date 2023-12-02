@@ -21,8 +21,6 @@ set(src_files )
 add_executable(
   arpwatch 
   ${src_files} 
-  ${FLEX_arpwatchScanner_OUTPUTS} 
-  ${BISON_arpwatchParser_OUTPUTS}
 )
 
 # Link the compiler flags to the executable
