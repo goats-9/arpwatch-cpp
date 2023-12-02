@@ -1,5 +1,9 @@
+/**
+ * File: arpwatch_mysql.cpp
+*/
+
 #if HAVE_CONFIG_H
-#include "config.h"
+#include "config.hpp"
 #endif
 
 #include "shm.hpp"
@@ -32,14 +36,14 @@ struct ctx_s {
 	MYSQL_BIND bind[7];
 	struct {
 		long long int timestamp;
-		char hostname[HOSTNAME_LEN];
+		std::string hostname;
 		unsigned long hostname_len;
-		char iface[IFNAMSIZ];
+		std::string iface;
 		unsigned long iface_len;
 		int vlan_tag;
-		char mac[ETHER_ADDR_LEN];
+		std::string mac;
 		unsigned long mac_len;
-		char ip[16];
+		std::string ip;
 		unsigned long ip_len;
 		int origin;
 	} bind_data;
