@@ -20,3 +20,15 @@ cmake ..
 cmake --build . --target install
 ./arpwatch  
 ```
+
+## Files
+
+1. `arpwatch.cpp`: Main program
+2. `pcap_monitor.cpp`: Monitor for ARP packets on selected interfaces.
+3. `mysql_interface.cpp`: Interface to DB to store ARP records.
+4. `send_mail.cpp`: Send mail to network admin.
+5. `arp_checks.cpp`: Implement various checks such as (see `man 8 arpwatch`)
+    - new station
+    - flip flop
+    - new activity
+    - changed ethernet address
