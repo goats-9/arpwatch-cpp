@@ -25,10 +25,26 @@ cmake --build . --target install
 
 1. `arpwatch.cpp`: Main program
 2. `pcap_monitor.cpp`: Monitor for ARP packets on selected interfaces.
-3. `mysql_interface.cpp`: Interface to DB to store ARP records.
-4. `send_mail.cpp`: Send mail to network admin.
-5. `arp_checks.cpp`: Implement various checks such as (see `man 8 arpwatch`)
+3. `mysql_interface.cpp`: Interface to DB to store ARP records. DB functions offered:
+    - Insert record
+    - Update record
+    - Delete record
+    - Retrieve record
+4. `syslog_output.cpp`: Log output to `syslog`.
+5. `send_mail.cpp`: Send mail to network admin.
+6. `arp_checks.cpp`: Implement various checks such as (see `man 8 arpwatch`)
     - new station
     - flip flop
     - new activity
     - changed ethernet address
+
+## Database Schema
+
+The database has one table `arp_records`. Its schema is as follows (`mac` shall be the primary key).
+
+| Field | Type |
+|-|-|
+| ip | string |
+| interface | string |
+| mac | string |
+| time | timestamp |
