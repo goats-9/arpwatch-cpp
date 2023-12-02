@@ -12,10 +12,13 @@ target_compile_options(
   "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
+# Find the libcurl package
+find_package(CURL REQUIRED)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 # Add files to build here
-set(src_files )
+set(src_files send_mail.cpp)
 
 # Add the executable
 add_executable(
