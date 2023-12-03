@@ -44,3 +44,6 @@ _deps
 *.exe
 *.out
 *.app
+
+# Build directories
+build

@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     // Main code goes here
     while (1) {
-
+        std::vector<ArpAddresses> v = extractARP();
     }
 
     return 0;

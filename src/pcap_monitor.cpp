@@ -101,16 +101,3 @@ std::vector<ArpAddresses> extractARP() {
 
     return arpAddresses;
 }
-
-int main() {
-    std::vector<ArpAddresses> addresses = extractARP();
-
-    // Display the results
-    for (const auto &addr : addresses) {
-        std::cout << "Sender IP: " << addr.senderIp << ", Sender MAC: " << addr.senderMac << std::endl;
-        std::cout << "Target IP: " << addr.targetIp << ", Target MAC: " << addr.targetMac << std::endl;
-        std::cout << std::endl;
-    }
-
-    return 0;
-}

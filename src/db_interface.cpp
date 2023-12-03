@@ -11,7 +11,7 @@ pqxx::connection *db_session_init() {
     }
 }
 
-int terminate_session(pqxx::connection *conn) {
+int db_session_close(pqxx::connection *conn) {
     try {
         conn->disconnect();
         return 0;

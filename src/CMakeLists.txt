@@ -12,11 +12,12 @@ target_compile_options(
   "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
-# Find the libcurl package
+# Find or include packages
 find_package(CURL REQUIRED)
+find_package(PostgreSQL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PQXX REQUIRED libpqxx)
-find_package(PCAP REQUIRED)
+include(FindPCAP.cmake)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
@@ -40,8 +41,10 @@ add_executable(
 target_link_libraries(
   arpwatch 
   PUBLIC arpwatch_compiler_flags
-  PRIVATE ${PQXX_LINK_LIBRARIES} PostgreSQL::PostgreSQL
-  PRIVATE ${PCAP_LINK_LIBRARIES}
+  PRIVATE ${PQXX_LIBRARIES} 
+  PRIVATE PostgreSQL::PostgreSQL
+  PRIVATE ${PCAP_LIBRARY}
+  PRIVATE ${CURL_LIBRARIES}
 )
 
 # Add the binary tree to the search path for include files
