@@ -16,6 +16,7 @@ target_compile_options(
 find_package(CURL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PQXX REQUIRED libpqxx)
+find_package(PCAP REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
@@ -39,6 +40,7 @@ target_link_libraries(
   arpwatch 
   PUBLIC arpwatch_compiler_flags
   PRIVATE ${PQXX_LINK_LIBRARIES} PostgreSQL::PostgreSQL
+  PRIVATE ${PCAP_LINK_LIBRARIES}
 )
 
 # Add the binary tree to the search path for include files
