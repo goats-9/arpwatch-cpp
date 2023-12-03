@@ -30,16 +30,6 @@ struct arp_record {
 };
 
 /**
- * TODO:
- * 1. Insert and update
- * 2. Retrieve
- *    - by MAC/bool (new station)
- *    - by MAC and IP (new activity)
- *    - top 2 records for MAC (by tstamp, flip flop)
- *    - by IP (latest tstamp, changed ethernet address)
-*/
-
-/**
  * @brief Insert MAC-IP record into `arp_records`.
  * @param conn Pointer to `pqxx::connection` object for the current session.
  * @param ar `arp_record` struct for the record to be inserted.
@@ -50,12 +40,29 @@ int insert_record(pqxx::connection *conn, arp_record &ar);
 /**
  * @brief Retrieve two most recent MAC-IP records from `arp_records` by MAC.
  * @param conn Pointer to `pqxx::connection` object for the current session.
- * @param mac MAC address.
+ * @param mac MAC address
  * @return `std::vector<arp_record>` object containing the required records. In case of an
  * error, the returned object will be empty.
 */
 std::vector<arp_record> retrieve_record_by_mac(pqxx::connection *conn, std::string &mac);
+
+/**
+ * @brief Retrieve the most recent MAC-IP record from `arp_records` by IP.
+ * @param conn Pointer to `pqxx::connection` object for the current session.
+ * @param ip IP address.
+ * @return `std::vector<arp_record>` object containing the required records. In case of an
+ * error, the returned object will be empty.
+*/
 std::vector<arp_record> retrieve_record_by_ip(pqxx::connection *conn, std::string &ip);
+
+/**
+ * @brief Retrieve MAC-IP record from `arp_records` by MAC and IP.
+ * @param conn Pointer to `pqxx::connection` object for the current session.
+ * @param mac MAC address.
+ * @param ip IP address.
+ * @return `std::vector<arp_record>` object containing the required records. In case of an
+ * error, the returned object will be empty.
+*/
 std::vector<arp_record> retrieve_record_by_mac_ip(pqxx::connection *conn, std::string &mac, std::string &ip);
 
 /**
