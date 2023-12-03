@@ -1,15 +1,4 @@
-#include <iostream>
-#include <pcap.h>
-#include <arpa/inet.h>
-#include <vector>
-#include <string>
-
-struct ArpAddresses {
-    std::string senderIp;
-    std::string senderMac;
-    std::string targetIp;
-    std::string targetMac;
-};
+#include "pcap_monitor.hpp"
 
 void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses) {
     // arp header is 28 bytes.
