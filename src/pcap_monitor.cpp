@@ -123,7 +123,7 @@ void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const 
     }
 }
 
-std::vector<ArpAddresses> listenPCAP(const char *dev_name)
+void listenPCAP(const char *dev_name)
 {
     struct arp_record packet_info;
     packet_info.iface = dev_name;
@@ -137,7 +137,6 @@ std::vector<ArpAddresses> listenPCAP(const char *dev_name)
     if (handle == nullptr)
     {
         fprintf(stderr, "Could not open device: %s\n", errbuf);
-        return arpAddresses;
     }
     bpf_u_int32 netaddr = 0, mask = 0; /* To Store network address and netmask   */
     struct bpf_program filter;         /* Place to store the BPF filter program  */
@@ -168,32 +167,27 @@ std::vector<ArpAddresses> listenPCAP(const char *dev_name)
 
     // Close the handle
     pcap_close(handle);
-
-    return arpAddresses;
 }
 
-// std::vector<ArpAddresses> extractARP()
-// {
-//     std::vector<ArpAddresses> arpAddresses;
-//     char errbuf[PCAP_ERRBUF_SIZE];
-//     pcap_if_t *alldevs, *dev;
+void extractARP()
+{
+    std::vector<ArpAddresses> arpAddresses;
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_if_t *alldevs, *dev;
 
-//     // this gives the list of all devices
-//     if (pcap_findalldevs(&alldevs, errbuf) == -1)
-//     {
-//         fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
-//         return arpAddresses;
-//     }
+    // this gives the list of all devices
+    if (pcap_findalldevs(&alldevs, errbuf) == -1)
+    {
+        fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
+        exit(1);
+    }
 
-//     // iterate through all available interfaces
-//     for (dev = alldevs; dev != NULL; dev = dev->next)
-//     {
-//         std::cout << "listening " << dev->name << "\n";
-//         std::vector<ArpAddresses> addressesOnInterface = listenPCAP(dev->name);
-//         arpAddresses.insert(arpAddresses.end(), addressesOnInterface.begin(), addressesOnInterface.end());
-//     }
+    // iterate through all available interfaces
+    for (dev = alldevs; dev != NULL; dev = dev->next)
+    {
+        std::cout << "listening " << dev->name << "\n";
+        listenPCAP(dev->name);
+    }
 
-//     pcap_freealldevs(alldevs);
-
-//     return arpAddresses;
-// }
+    pcap_freealldevs(alldevs);
+}
