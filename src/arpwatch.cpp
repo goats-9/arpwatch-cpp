@@ -16,9 +16,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     // Main code goes here
-    while (1) {
-        std::vector<ArpAddresses> v = extractARP();
-    }
+    while (1) extractARP();
 
     return 0;
 }
