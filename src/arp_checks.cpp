@@ -6,75 +6,96 @@ using namespace std;
 
 // Check functions
 
-bool new_station(pqxx::connection *conn,arp_record& record)
+bool new_station(pqxx::connection *conn, arp_record &record)
 {
-    vector<arp_record> old_recs = retrieve_record(conn,record.mac);
+    vector<arp_record> old_recs = retrieve_record_by_mac(conn, record.mac);
     if (old_recs.empty())
     {
-        insert_record(conn,record.mac,record.ip,record.iface);
-        arp_log(LOG_INFO,"New station found on ip " + record.ip + " with mac address " + record.mac);
+        arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac);
         string body =
-            "A new station detected with ip, mac, interface as follows:\n" +
+            "A new station detected with ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
             "\nMAC: " + record.mac +
-            "\ninterface: " + record.iface ;
-        send_email(EMAIL,"ARPWATCH",body);
+            "\ninterface: " + record.iface +
+            "\ntime: " + ctime(&record.tstamp);
+        send_email(EMAIL, "ARPWATCH", body);
         return true;
     }
     return false;
 }
 
-bool new_activity(pqxx::connection *conn,arp_record& record)
+bool flip_flop(pqxx::connection *conn, arp_record &record)
 {
-    vector<arp_record> old_recs = retrieve_record(conn,record.mac);
+    vector<arp_record> old_recs = retrieve_record_by_mac(conn, record.mac);
 
-    if (old_recs[0].ip == record.ip)
+    if (old_recs.size() < 2)
     {
         return false;
     }
-    if (old_recs.size() == 1)
+    if (record.ip == old_recs[1].ip)
     {
-        insert_record(conn,record.mac,record.ip,record.iface);
-        return false;
+        string message =
+            "Flip flop found between " + record.ip + ", " + old_recs[1].ip +
+            " for mac address " + record.mac + " on interface " + record.iface +
+            " at " + ctime(&record.tstamp);
+        arp_log(LOG_INFO, message);
+        send_email(EMAIL, "ARPWATCH", message);
+        return true;
     }
+}
 
-    if ( record.ip == old_recs[1].ip && record.tstamp - old_recs[0].tstamp <= NEWACTIVITY_DELTA)
+bool new_activity(pqxx::connection *conn, arp_record &record)
+{
+    vector<arp_record> old_recs = retrieve_record_by_mac_ip(conn, record.mac, record.ip);
+
+    if (!old_recs.empty() && record.tstamp - old_recs[0].tstamp <= NEWACTIVITY_DELTA)
     {
         // update recode here
-        arp_log(LOG_INFO,"New activity found on ip " + record.ip + " with mac address " + record.mac);
+        arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac);
         string body =
-            "A new activity detected with ip, mac, interface as follows:\n" +
+            "A new activity detected from ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
             "\nMAC: " + record.mac +
-            "\ninterface: " + record.iface ;
-        send_email(EMAIL,"ARPWATCH",body);
+            "\ninterface: " + record.iface +
+            "\ntime: " + ctime(&record.tstamp);
+        send_email(EMAIL, "ARPWATCH", body);
         return true;
     }
     return false;
 }
 
-void update_and_check_records(arp_record& new_record) {
+bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
+{
+}
+
+void update_and_check_records(arp_record &new_record)
+{
     pqxx::connection *conn = db_session_init();
-    if (new_station(conn,new_record))
+    if (new_station(conn, new_record))
     {
+        insert_record(conn, new_record);
         db_session_close(conn);
         return;
     }
-    if (flip_flop(conn,new_record))
+    if (flip_flop(conn, new_record))
     {
+        insert_record(conn, new_record);
         db_session_close(conn);
         return;
     }
-    if (new_activity(conn,new_record))
+    if (new_activity(conn, new_record))
     {
+        insert_record(conn, new_record);
         db_session_close(conn);
         return;
     }
-    if (changed_ethernet_address(conn,new_record))
+    if (changed_ethernet_address(conn, new_record))
     {
+        insert_record(conn, new_record);
         db_session_close(conn);
         return;
     }
+    insert_record(conn, new_record);
     db_session_close(conn);
     return;
 }
