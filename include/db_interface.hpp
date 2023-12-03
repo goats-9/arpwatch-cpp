@@ -9,9 +9,6 @@
 /* C++ psql header files */
 #include <pqxx/pqxx>
 
-/* Global variables */
-pqxx::connection conn;
-
 /* SQL prepared statements */
 #define ARP_RETRIEVE_SQL_QUERY "SELECT * FROM arp_records WHERE mac = $1"
 #define ARP_INSERT_SQL_QUERY "INSERT INTO arp_records VALUES ($1, $2, $3, $4)"

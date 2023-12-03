@@ -2,7 +2,7 @@
 
 // #include <map>
 #include <string>
-#include "mysql_interface.hpp"
+#include "db_interface.hpp"
 
 #define STATUS_NO_UPDATE -1
 #define STATUS_NEW_STATION 0
@@ -22,31 +22,31 @@
  * @param record packet's destination ip,mac,timestamp and interface
  * @return Return true or false
 */
-bool new_station(const sql::Connection *conn, const arp_record& record);
+bool new_station(pqxx::connection *conn, arp_record& record);
 
 /**
  * @brief Checks whether MAC address is associated with a different IP in a short time frame
  * @param record packet's destination ip,mac,timestamp and interface
  * @return Return true or false
 */
-bool flip_flop(const sql::Connection *conn,const arp_record& record);
+bool flip_flop(pqxx::connection *conn,arp_record& record);
 
 /**
  * @brief Checks whether MAC address not active for long time is seen again
  * @param record packet's destination ip,mac,timestamp and interface
  * @return Return true or false
 */
-bool new_activity(const sql::Connection *conn,const arp_record& record);
+bool new_activity(pqxx::connection *conn,arp_record& record);
 
 /**
  * @brief Checks whether IP address is now associated with different MAC
  * @param record packet's destination ip,mac,timestamp and interface
  * @return Return true or false
 */
-bool changed_ethernet_address(const sql::Connection *conn, const arp_record& record);
+bool changed_ethernet_address(pqxx::connection *conn,arp_record& record);
 
 /**
  * @brief performs all checks
  * @param new_record packet's destination ip,mac and interface
 */
-void update_and_check_records(const arp_record& record);
+void update_and_check_records(arp_record& record);
