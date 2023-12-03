@@ -1,4 +1,15 @@
-#include "pcap_monitor.hpp"
+#include <iostream>
+#include <pcap.h>
+#include <arpa/inet.h>
+#include <vector>
+#include <string>
+
+struct ArpAddresses {
+    std::string senderIp;
+    std::string senderMac;
+    std::string targetIp;
+    std::string targetMac;
+};
 
 void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses) {
     // arp header is 28 bytes.
@@ -37,12 +48,15 @@ void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddres
     arpAddresses.push_back(addresses);
 }
 
-void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet, std::vector<ArpAddresses> &arpAddresses) {
+void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet) {
     // Callback function for pcap_loop
+    std::vector<ArpAddresses> &arpAddresses = *reinterpret_cast<std::vector<ArpAddresses>*>(user);
+
     if (*(uint16_t *)(packet + 12) == ntohs(0x0806)) {
         processArpPacket(packet, arpAddresses);
     }
 }
+
 
 std::vector<ArpAddresses> listenPCAP() {
     std::vector<ArpAddresses> arpAddresses;
@@ -59,6 +73,7 @@ std::vector<ArpAddresses> listenPCAP() {
 
     // The 100 here shows that it will terminate after listening to 100 packets. Can be changed.
     pcap_loop(handle, 100, packetHandler, reinterpret_cast<unsigned char *>(&arpAddresses));
+
     // Close the handle
     pcap_close(handle);
 
