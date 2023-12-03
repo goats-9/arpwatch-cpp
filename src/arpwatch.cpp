@@ -1,7 +1,7 @@
 #include "arpwatch.hpp"
 
-void exit_handler() {
-    std::cout << "Ctrl+C detected, exiting..." << std::endl;
+void exit_handler(int s) {
+    std::cout << "Caught signal " << s << std::endl;
     exit(0);
 }
 
