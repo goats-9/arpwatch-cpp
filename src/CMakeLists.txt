@@ -24,6 +24,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 set(src_files
   arp_checks.cpp  
   db_interface.cpp
+  pcap_monitor.cpp
   send_mail.cpp
   syslog_interface.cpp
 )
