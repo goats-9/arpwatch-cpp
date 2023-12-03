@@ -1,3 +1,0 @@
-export PGUSER=root
-export PGDATABASE=arp_db
-wireshark &
