@@ -22,6 +22,7 @@ set(src_files
   arp_checks.cpp  
   mysql_interface.cpp
   send_mail.cpp
+  syslog_interface.cpp
 )
 
 # Add the executable
