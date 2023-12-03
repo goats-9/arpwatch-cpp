@@ -26,7 +26,7 @@ static size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp) 
     return 0;
 }
 
-int send_mail(std::string &sub, std::string &body) {
+int send_email(std::string &sub, std::string &body) {
     CURL *curl;
     CURLcode res = CURLE_OK;
     struct upload_status upload_ctx;
