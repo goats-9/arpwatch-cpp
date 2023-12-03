@@ -7,10 +7,10 @@ using namespace std;
 
 bool new_station(const sql::Connection *conn,const arp_record& record)
 {
-    arp_record old_rec = retrieve_record(conn,record.);
-
+    arp_record old_rec = retrieve_record(conn,record.mac);
     if (old_rec.tstamp == -1)
     {
+        insert_record(conn,record.mac,record.ip,record.iface);
         return true;
     }
     return false;
@@ -18,10 +18,9 @@ bool new_station(const sql::Connection *conn,const arp_record& record)
 
 bool new_activity(const sql::Connection *conn,const arp_record& record)
 {
-    sql::Connection *conn = start_session(DB_USERNAME,DB_PASSWORD,DB_NAME);
     arp_record old_rec = retrieve_record(conn,record.mac);
 
-    if (old_rec.tstamp == -1)
+    if ( record.tstamp - old_rec.tstamp <= NEWACTIVITY_DELTA)
     {
         return true;
     }
@@ -52,6 +51,6 @@ void update_and_check_records(const arp_record& new_record) {
     {
         terminate_session(conn);
     }
-
+    terminate_session(conn);
     return;
 }
