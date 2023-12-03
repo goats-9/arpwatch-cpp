@@ -12,13 +12,14 @@ bool new_station(pqxx::connection *conn, arp_record &record)
 
     if (old_recs.empty())
     {
-        arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac + " at " + ctime(&record.tstamp));
         string body =
             "A new station detected with ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
             "\nMAC: " + record.mac +
             "\ninterface: " + record.iface +
             "\ntime: " + ctime(&record.tstamp);
+        // arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac + " at " + ctime(&record.tstamp));
+        arp_log(LOG_INFO,body);
         send_email(EMAIL, "ARPWATCH", body);
         return true;
     }
@@ -49,13 +50,14 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
     if (!old_recs.empty() && record.tstamp - old_recs[0].tstamp <= NEWACTIVITY_DELTA)
     {
         // update recode here
-        arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
         string body =
             "A new activity detected from ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
             "\nMAC: " + record.mac +
             "\ninterface: " + record.iface +
             "\ntime: " + ctime(&record.tstamp);
+        // arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
+        arp_log(LOG_INFO,body);
         send_email(EMAIL, "ARPWATCH", body);
         return true;
     }
