@@ -14,14 +14,15 @@ target_compile_options(
 
 # Find the libcurl package
 find_package(CURL REQUIRED)
-find_package(MYSQL REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(PQXX REQUIRED libpqxx)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 # Add files to build here
 set(src_files
   arp_checks.cpp  
-  mysql_interface.cpp
+  db_interface.cpp
   send_mail.cpp
   syslog_interface.cpp
 )
@@ -37,6 +38,7 @@ add_executable(
 target_link_libraries(
   arpwatch 
   PUBLIC arpwatch_compiler_flags
+  PRIVATE ${PQXX_LINK_LIBRARIES} PostgreSQL::PostgreSQL
 )
 
 # Add the binary tree to the search path for include files
