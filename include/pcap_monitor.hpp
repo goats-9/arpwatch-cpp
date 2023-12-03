@@ -21,6 +21,6 @@ struct ArpAddresses {
 };
 
 void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses);
-void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet, std::vector<ArpAddresses> &arpAddresses);
-std::vector<ArpAddresses> listenPCAP();
-std::vector<ArpAddresses> extractARP();
+void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet);
+// std::vector<ArpAddresses> listenPCAP();
+// std::vector<ArpAddresses> extractARP();

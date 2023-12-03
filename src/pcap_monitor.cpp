@@ -3,6 +3,9 @@
 #include <arpa/inet.h>
 #include <vector>
 #include <string>
+#include "pcap_monitor.hpp"
+#include "arp_checks.hpp"
+#include "db_interface.hpp"
 
 /* ARP Header, (assuming Ethernet+IPv4)            */
 #define ARP_REQUEST 1 /* ARP Request             */
@@ -21,60 +24,63 @@ typedef struct arphdr
     u_char tpa[4];   /* Target IP address       */
 } arphdr_t;
 
-struct ArpAddresses
-{
-    std::string senderIp;
-    std::string senderMac;
-    std::string targetIp;
-    std::string targetMac;
-};
+// struct ArpAddresses
+// {
+//     std::string senderIp;
+//     std::string senderMac;
+//     std::string targetIp;
+//     std::string targetMac;
+// };
 
-void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses)
-{
-    // arp header is 28 bytes.
-    const uint8_t *arpHeader = packet;
+// void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses)
+// {
+//     // arp header is 28 bytes.
+//     const uint8_t *arpHeader = packet;
 
-    uint8_t hardwareAddrLength = *(arpHeader + 4);
-    uint8_t protocolAddrLength = *(arpHeader + 5);
+//     uint8_t hardwareAddrLength = *(arpHeader + 4);
+//     uint8_t protocolAddrLength = *(arpHeader + 5);
 
-    const uint8_t *senderHardwareAddr = arpHeader + 8;
-    const uint8_t *senderProtocolAddr = senderHardwareAddr + hardwareAddrLength;
-    const uint8_t *targetHardwareAddr = senderProtocolAddr + protocolAddrLength;
-    const uint8_t *targetProtocolAddr = targetHardwareAddr + hardwareAddrLength;
+//     const uint8_t *senderHardwareAddr = arpHeader + 8;
+//     const uint8_t *senderProtocolAddr = senderHardwareAddr + hardwareAddrLength;
+//     const uint8_t *targetHardwareAddr = senderProtocolAddr + protocolAddrLength;
+//     const uint8_t *targetProtocolAddr = targetHardwareAddr + hardwareAddrLength;
 
-    ArpAddresses addresses;
+//     ArpAddresses addresses;
 
-    // Convert MAC addresses to string
-    for (int i = 0; i < hardwareAddrLength; ++i)
-    {
-        char buffer[3];
-        snprintf(buffer, sizeof(buffer), "%02X", senderHardwareAddr[i]);
-        addresses.senderMac += buffer;
+//     // Convert MAC addresses to string
+//     for (int i = 0; i < hardwareAddrLength; ++i)
+//     {
+//         char buffer[3];
+//         snprintf(buffer, sizeof(buffer), "%02X", senderHardwareAddr[i]);
+//         addresses.senderMac += buffer;
 
-        snprintf(buffer, sizeof(buffer), "%02X", targetHardwareAddr[i]);
-        addresses.targetMac += buffer;
-    }
+//         snprintf(buffer, sizeof(buffer), "%02X", targetHardwareAddr[i]);
+//         addresses.targetMac += buffer;
+//     }
 
-    // Convert IP addresses to string
-    for (int i = 0; i < protocolAddrLength; ++i)
-    {
-        addresses.senderIp += std::to_string(senderProtocolAddr[i]);
-        addresses.targetIp += std::to_string(targetProtocolAddr[i]);
-        if (i < protocolAddrLength - 1)
-        {
-            addresses.senderIp += ".";
-            addresses.targetIp += ".";
-        }
-    }
+//     // Convert IP addresses to string
+//     for (int i = 0; i < protocolAddrLength; ++i)
+//     {
+//         addresses.senderIp += std::to_string(senderProtocolAddr[i]);
+//         addresses.targetIp += std::to_string(targetProtocolAddr[i]);
+//         if (i < protocolAddrLength - 1)
+//         {
+//             addresses.senderIp += ".";
+//             addresses.targetIp += ".";
+//         }
+//     }
 
-    arpAddresses.push_back(addresses);
-}
+//     arpAddresses.push_back(addresses);
+// }
 
 void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet)
 {
     // Callback function for pcap_loop
-    std::vector<ArpAddresses> &arpAddresses = *reinterpret_cast<std::vector<ArpAddresses> *>(user);
-
+    // std::vector<ArpAddresses> &arpAddresses = *reinterpret_cast<std::vector<ArpAddresses> *>(user);
+    struct arp_record *packet_info = (struct arp_record *)(user);
+    char temp[10];
+    std::string t_mac;
+    std::string t_ip;
     arphdr_t *arpheader = (struct arphdr *)(packet + 14); /* Point to the ARP header */
 
     printf("\n\nReceived Packet Size: %d bytes\n", pkthdr->len);
@@ -84,32 +90,43 @@ void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const 
     /* If is Ethernet and IPv4, print packet contents */
     if (ntohs(arpheader->htype) == 1 && ntohs(arpheader->ptype) == 0x0800)
     {
-        printf("Sender MAC: ");
+        // printf("Sender MAC: ");
+
+        // for (int i = 0; i < 6; i++)
+        //     printf("%02X:", arpheader->sha[i]);
+
+        // printf("\nSender IP: ");
+
+        // for (int i = 0; i < 4; i++)
+        //     printf("%d.", arpheader->spa[i]);
+
+        // printf("\nTarget MAC: ");
 
         for (int i = 0; i < 6; i++)
-            printf("%02X:", arpheader->sha[i]);
+        {
+            sprintf(temp,"%02X:", arpheader->tha[i]);
+            t_mac = temp + t_mac;
+        }
+        // std::cout << t_mac;
 
-        printf("\nSender IP: ");
-
-        for (int i = 0; i < 4; i++)
-            printf("%d.", arpheader->spa[i]);
-
-        printf("\nTarget MAC: ");
-
-        for (int i = 0; i < 6; i++)
-            printf("%02X:", arpheader->tha[i]);
-
-        printf("\nTarget IP: ");
+        // printf("\nTarget IP: ");
 
         for (int i = 0; i < 4; i++)
-            printf("%d.", arpheader->tpa[i]);
-
-        printf("\n");
+        {
+            sprintf(temp,"%d.", arpheader->tpa[i]);
+            t_ip = temp + t_ip;
+        }
+        packet_info->ip = t_ip;
+        packet_info->mac = t_mac;
+        packet_info->tstamp = pkthdr->ts.tv_sec;
+        update_and_check_records(*packet_info);
     }
 }
 
 std::vector<ArpAddresses> listenPCAP(const char *dev_name)
 {
+    struct arp_record packet_info;
+    packet_info.iface = dev_name;
     std::vector<ArpAddresses> arpAddresses;
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
@@ -147,7 +164,7 @@ std::vector<ArpAddresses> listenPCAP(const char *dev_name)
     }
 
     // The 100 here shows that it will terminate after listening to 100 packets. Can be changed.
-    pcap_loop(handle, 10, packetHandler, reinterpret_cast<unsigned char *>(&arpAddresses));
+    pcap_loop(handle, 10, packetHandler, (u_char *)&packet_info);
 
     // Close the handle
     pcap_close(handle);
@@ -155,28 +172,28 @@ std::vector<ArpAddresses> listenPCAP(const char *dev_name)
     return arpAddresses;
 }
 
-std::vector<ArpAddresses> extractARP()
-{
-    std::vector<ArpAddresses> arpAddresses;
-    char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_if_t *alldevs, *dev;
+// std::vector<ArpAddresses> extractARP()
+// {
+//     std::vector<ArpAddresses> arpAddresses;
+//     char errbuf[PCAP_ERRBUF_SIZE];
+//     pcap_if_t *alldevs, *dev;
 
-    // this gives the list of all devices
-    if (pcap_findalldevs(&alldevs, errbuf) == -1)
-    {
-        fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
-        return arpAddresses;
-    }
+//     // this gives the list of all devices
+//     if (pcap_findalldevs(&alldevs, errbuf) == -1)
+//     {
+//         fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
+//         return arpAddresses;
+//     }
 
-    // iterate through all available interfaces
-    for (dev = alldevs; dev != NULL; dev = dev->next)
-    {
-        std::cout << "listening " << dev->name << "\n";
-        std::vector<ArpAddresses> addressesOnInterface = listenPCAP(dev->name);
-        arpAddresses.insert(arpAddresses.end(), addressesOnInterface.begin(), addressesOnInterface.end());
-    }
+//     // iterate through all available interfaces
+//     for (dev = alldevs; dev != NULL; dev = dev->next)
+//     {
+//         std::cout << "listening " << dev->name << "\n";
+//         std::vector<ArpAddresses> addressesOnInterface = listenPCAP(dev->name);
+//         arpAddresses.insert(arpAddresses.end(), addressesOnInterface.begin(), addressesOnInterface.end());
+//     }
 
-    pcap_freealldevs(alldevs);
+//     pcap_freealldevs(alldevs);
 
-    return arpAddresses;
-}
+//     return arpAddresses;
+// }
