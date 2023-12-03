@@ -3,12 +3,13 @@
 #include <iostream>
 #include <string>
 #include <curl/curl.h>
+#include <cstring>
+#include "env.hpp"
 
 /**
  * @brief Send email to recipient with a subject and body.
- * @param to Recipient email address.
- * @param subject Subject of the email.
+ * @param sub Subject of the email.
  * @param body Body of the email.
- * @return `void`
+ * @return 0 if successful, nonzero otherwise.
 */
-void send_email(const std::string &to, const std::string &subject, const std::string &body);
+int send_email(const std::string &sub, const std::string &body);
