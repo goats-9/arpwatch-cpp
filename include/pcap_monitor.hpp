@@ -20,7 +20,7 @@ struct ArpAddresses {
     std::string targetMac;
 };
 
-void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddresses);
+void extractARP();
 void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet);
 // std::vector<ArpAddresses> listenPCAP();
 // std::vector<ArpAddresses> extractARP();
