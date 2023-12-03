@@ -20,7 +20,7 @@ bool new_station(pqxx::connection *conn, arp_record &record)
             "\ntime: " + ctime(&record.tstamp);
         // arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac + " at " + ctime(&record.tstamp));
         arp_log(LOG_INFO,body);
-        send_email(EMAIL, "ARPWATCH", body);
+        send_email("ARPWATCH", body);
         return true;
     }
     return false;
@@ -37,7 +37,7 @@ bool flip_flop(pqxx::connection *conn, arp_record &record)
             " for mac address " + record.mac + " on interface " + record.iface +
             " at " + ctime(&record.tstamp);
         arp_log(LOG_INFO, message);
-        send_email(EMAIL, "ARPWATCH", message);
+        send_email("ARPWATCH", message);
         return true;
     }
     return false;
@@ -58,7 +58,7 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
             "\ntime: " + ctime(&record.tstamp);
         // arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
         arp_log(LOG_INFO,body);
-        send_email(EMAIL, "ARPWATCH", body);
+        send_email("ARPWATCH", body);
         return true;
     }
     return false;
@@ -75,7 +75,7 @@ bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
             " on interface " + record.iface + " at " + ctime(&record.tstamp);
         ;
         arp_log(LOG_INFO,message);
-        send_email(EMAIL, "ARPWATCH", message);
+        send_email("ARPWATCH", message);
         return true;
     }
 }
