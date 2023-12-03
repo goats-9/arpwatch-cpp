@@ -56,7 +56,9 @@ void processArpPacket(const u_char *packet) {
 
 void packetHandler(unsigned char* user, const struct pcap_pkthdr* pkthdr, const unsigned char* packet) {
     // Callback function for pcap_loop
-    processArpPacket(packet);
+    if (*(uint16_t *)(packet + 12) == ntohs(0x0806)) {
+        processArpPacket(packet);
+    }
 }
 
 void listenPCAP(const char* interface) {
