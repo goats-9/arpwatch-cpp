@@ -9,9 +9,10 @@ using namespace std;
 bool new_station(pqxx::connection *conn, arp_record &record)
 {
     vector<arp_record> old_recs = retrieve_record_by_mac(conn, record.mac);
+
     if (old_recs.empty())
     {
-        arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac);
+        arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac + " at " + ctime(&record.tstamp));
         string body =
             "A new station detected with ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
@@ -28,11 +29,7 @@ bool flip_flop(pqxx::connection *conn, arp_record &record)
 {
     vector<arp_record> old_recs = retrieve_record_by_mac(conn, record.mac);
 
-    if (old_recs.size() < 2)
-    {
-        return false;
-    }
-    if (record.ip == old_recs[1].ip)
+    if (old_recs.size() == 2 && record.ip == old_recs[1].ip)
     {
         string message =
             "Flip flop found between " + record.ip + ", " + old_recs[1].ip +
@@ -42,6 +39,7 @@ bool flip_flop(pqxx::connection *conn, arp_record &record)
         send_email(EMAIL, "ARPWATCH", message);
         return true;
     }
+    return false;
 }
 
 bool new_activity(pqxx::connection *conn, arp_record &record)
@@ -51,7 +49,7 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
     if (!old_recs.empty() && record.tstamp - old_recs[0].tstamp <= NEWACTIVITY_DELTA)
     {
         // update recode here
-        arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac);
+        arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
         string body =
             "A new activity detected from ip, mac, interface, time as follows:\n" +
             string("IP: ") + record.ip +
@@ -66,6 +64,18 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
 
 bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
 {
+    vector<arp_record> old_recs = retrieve_record_by_ip(conn, record.ip);
+
+    if (!old_recs.empty() && old_recs[0].mac != record.mac)
+    {
+        string message = 
+            "Ethernet address for ip " + record.ip + " changed from " + old_recs[0].mac + " to " + record.mac +
+            " on interface " + record.iface + " at " + ctime(&record.tstamp);
+        ;
+        arp_log(LOG_INFO,message);
+        send_email(EMAIL, "ARPWATCH", message);
+        return true;
+    }
 }
 
 void update_and_check_records(arp_record &new_record)
