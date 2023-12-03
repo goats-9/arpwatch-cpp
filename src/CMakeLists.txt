@@ -8,7 +8,7 @@ set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 target_compile_options(
   arpwatch_compiler_flags INTERFACE
-  "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-O2;-g>>"
+  "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-O2;-g;-lmysqlcppconn>>"
   "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
@@ -18,11 +18,15 @@ find_package(CURL REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 # Add files to build here
-set(src_files send_mail.cpp)
+set(src_files 
+  mysql_interface.cpp
+  send_mail.cpp
+)
 
 # Add the executable
 add_executable(
   arpwatch 
+  arpwatch.cpp
   ${src_files} 
 )
 
