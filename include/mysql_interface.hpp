@@ -21,9 +21,13 @@
  * @brief Struct representing records of arpwatch database.
 */
 struct arp_record {
+    /// @brief MAC address
     std::string mac;
+    /// @brief Interface
     std::string iface;
+    /// @brief IP address
     std::string ip;
+    /// @brief Timestamp
     int tstamp;
 };
 
