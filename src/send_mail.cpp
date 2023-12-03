@@ -32,7 +32,10 @@ int send_mail(std::string &sub, std::string &body) {
     struct upload_status upload_ctx;
 
     upload_ctx.lines_read = 0;
-    payload_text = "To: " + std::string(ADMIN_EMAIL) + "\r\nFrom: " + std::string(ADMIN_EMAIL) + "\r\nSubject: " + sub + "\r\n\r\n" + body + "\r\n";
+    payload_text = "To: " + std::string(ADMIN_EMAIL) 
+                    + "\r\nFrom: " + std::string(ADMIN_EMAIL) 
+                    + "\r\nSubject: " + sub + "\r\n\r\n" + body 
+                    + "\r\n";
 
     curl = curl_easy_init();
     if (curl) {
