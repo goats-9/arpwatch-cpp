@@ -1,39 +1,52 @@
 #pragma once
 
-#include <map>
+// #include <map>
 #include <string>
-#include <utility>
+#include "mysql_interface.hpp"
 
-struct ArpRecord {
-    std::string ip;
-    std::string mac;
-};
+#define STATUS_NO_UPDATE -1
+#define STATUS_NEW_STATION 0
+#define STATUS_NEW_ACTIVITY 1
+#define STATUS_FLIP_FLOP 2
+#define STATUS_NEW_MAC 3
 
-std::map<std::string, ArpRecord> records;
+#define NEWACTIVITY_DELTA (6*30*24*60*60)	/* 6 months in seconds */
+#define FLIPFLIP_DELTA (24*60*60)		/* 24 hours in seconds */
+
+// std::map<std::string, ArpRecord> records;
 
 // Check functions
-void new_station(const ArpRecord& record) {
-    // MAC address not in records => new station
-}
 
-void flip_flop(const ArpRecord& record) {
-    // MAC address associated with a different IP in a short time frame => flip flop
-}
+/**
+ * @brief Checks whether MAC address is there in records
+ * @param record packet's destination ip,mac,timestamp and interface
+ * @return Return true or false
+*/
+bool new_station(const sql::Connection *conn, const arp_record& record);
 
-void new_activity(const ArpRecord& record) {
-    // MAC address not active for long time is seen again => new activity
-}
+/**
+ * @brief Checks whether MAC address is associated with a different IP in a short time frame
+ * @param record packet's destination ip,mac,timestamp and interface
+ * @return Return true or false
+*/
+bool flip_flop(const sql::Connection *conn,const arp_record& record);
 
-void changed_ethernet_address(const ArpRecord& record) {
-    // IP address is now associated with different MAC => Ethernet address changed
-}
+/**
+ * @brief Checks whether MAC address not active for long time is seen again
+ * @param record packet's destination ip,mac,timestamp and interface
+ * @return Return true or false
+*/
+bool new_activity(const sql::Connection *conn,const arp_record& record);
 
-void update_and_check_records(const ArpRecord& new_record) {
-    new_station(new_record);
-    flip_flop(new_record);
-    new_activity(new_record);
-    changed_ethernet_address(new_record);
-    
-    // Update the records with the new_record
-    records[new_record.ip] = new_record;
-}
+/**
+ * @brief Checks whether IP address is now associated with different MAC
+ * @param record packet's destination ip,mac,timestamp and interface
+ * @return Return true or false
+*/
+bool changed_ethernet_address(const sql::Connection *conn, const arp_record& record);
+
+/**
+ * @brief performs all checks
+ * @param new_record packet's destination ip,mac and interface
+*/
+void update_and_check_records(const arp_record& record);
