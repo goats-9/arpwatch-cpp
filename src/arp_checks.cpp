@@ -51,10 +51,8 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
     {
         // update recode here
         string body =
-            "A new activity detected from ip, mac, interface, time as follows:\n" +
-            string("IP: ") + record.ip +
-            "\nMAC: " + record.mac +
-            "\ninterface: " + record.iface +
+            "A new activity detected from ip, mac, interface, time as follows:\nIP:" +
+            record.ip + "\nMAC: " + record.mac + "\ninterface: " + record.iface +
             "\ntime: " + ctime(&record.tstamp);
         // arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
         arp_log(LOG_INFO,body);
@@ -72,7 +70,7 @@ bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
     {
         string message = 
             "Ethernet address for ip " + record.ip + " changed from " + old_recs[0].mac + " to " + record.mac +
-            " on interface " + record.iface + " at " + ctime(&record.tstamp);
+            " on interface " + record.iface + " at " + string(ctime(&record.tstamp));
         ;
         arp_log(LOG_INFO,message);
         send_email("ARPWATCH", message);

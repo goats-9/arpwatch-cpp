@@ -24,9 +24,9 @@ int db_session_close(pqxx::connection *conn) {
 std::vector<arp_record> retrieve_record_by_mac(pqxx::connection *conn, std::string &mac) {
     std::vector<arp_record> db_records;
     try {
-        conn->prepare("retrieve_query", ARP_RETRIEVE_MAC_SQL_QUERY);
+        conn->prepare("retrieve_query_mac", ARP_RETRIEVE_MAC_SQL_QUERY);
         pqxx::work w{*conn};
-        pqxx::result res = w.exec_prepared("retrieve_query", mac);
+        pqxx::result res = w.exec_prepared("retrieve_query_mac", mac);
         // Parse pqxx::result into db_record
         for (auto const &row : res) {
             arp_record ar;
@@ -48,9 +48,9 @@ std::vector<arp_record> retrieve_record_by_mac(pqxx::connection *conn, std::stri
 std::vector<arp_record> retrieve_record_by_ip(pqxx::connection *conn, std::string &ip) {
     std::vector<arp_record> db_records;
     try {
-        conn->prepare("retrieve_query", ARP_RETRIEVE_IP_SQL_QUERY);
+        conn->prepare("retrieve_query_ip", ARP_RETRIEVE_IP_SQL_QUERY);
         pqxx::work w{*conn};
-        pqxx::result res = w.exec_prepared("retrieve_query", ip);
+        pqxx::result res = w.exec_prepared("retrieve_query_ip", ip);
         // Parse pqxx::result into db_record
         for (auto const &row : res) {
             arp_record ar;
@@ -72,9 +72,9 @@ std::vector<arp_record> retrieve_record_by_ip(pqxx::connection *conn, std::strin
 std::vector<arp_record> retrieve_record_by_mac_ip(pqxx::connection *conn, std::string &mac, std::string &ip) {
     std::vector<arp_record> db_records;
     try {
-        conn->prepare("retrieve_query", ARP_RETRIEVE_MAC_IP_SQL_QUERY);
+        conn->prepare("retrieve_query_mac_ip", ARP_RETRIEVE_MAC_IP_SQL_QUERY);
         pqxx::work w{*conn};
-        pqxx::result res = w.exec_prepared("retrieve_query", mac, ip);
+        pqxx::result res = w.exec_prepared("retrieve_query_mac_ip", mac, ip);
         // Parse pqxx::result into db_record
         for (auto const &row : res) {
             arp_record ar;
