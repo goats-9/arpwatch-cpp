@@ -21,10 +21,10 @@ int terminate_session(pqxx::connection *conn) {
     }
 }
 
-std::vector<arp_record> retrieve_record(pqxx::connection *conn, std::string &mac) {
+std::vector<arp_record> retrieve_record_by_mac(pqxx::connection *conn, std::string &mac) {
     std::vector<arp_record> db_records;
     try {
-        conn->prepare("retrieve_query", ARP_RETRIEVE_SQL_QUERY);
+        conn->prepare("retrieve_query", ARP_RETRIEVE_MAC_SQL_QUERY);
         pqxx::work w{*conn};
         pqxx::result res = w.exec_prepared("retrieve_query", mac);
         // Parse pqxx::result into db_record
@@ -45,12 +45,59 @@ std::vector<arp_record> retrieve_record(pqxx::connection *conn, std::string &mac
     return db_records;
 }
 
-int insert_record(pqxx::connection *conn, std::string &mac, std::string &iface, std::string &ip) {
+std::vector<arp_record> retrieve_record_by_ip(pqxx::connection *conn, std::string &ip) {
+    std::vector<arp_record> db_records;
     try {
-        conn->prepare("insert_query", ARP_RETRIEVE_SQL_QUERY);
-        std::time_t curr_tstamp = std::time(nullptr);
+        conn->prepare("retrieve_query", ARP_RETRIEVE_MAC_SQL_QUERY);
         pqxx::work w{*conn};
-        pqxx::result res = w.exec_prepared0("insert_query", mac, ip, iface, curr_tstamp);
+        pqxx::result res = w.exec_prepared("retrieve_query", ip);
+        // Parse pqxx::result into db_record
+        for (auto const &row : res) {
+            arp_record ar;
+            ar.mac = row["mac"].as<std::string>();
+            ar.ip = row["ip"].as<std::string>();
+            ar.iface = row["iface"].as<std::string>();
+            ar.tstamp = row["tstamp"].as<int>();
+            db_records.push_back(ar);
+        }
+        // Cleanup
+        w.commit();
+    } catch (std::exception const &e) {
+        std::cerr << "ERROR: " << e.what() << '\n';
+        db_records.clear();
+    }
+    return db_records;
+}
+
+std::vector<arp_record> retrieve_record_by_mac_ip(pqxx::connection *conn, std::string &mac, std::string &ip) {
+    std::vector<arp_record> db_records;
+    try {
+        conn->prepare("retrieve_query", ARP_RETRIEVE_MAC_SQL_QUERY);
+        pqxx::work w{*conn};
+        pqxx::result res = w.exec_prepared("retrieve_query", mac, ip);
+        // Parse pqxx::result into db_record
+        for (auto const &row : res) {
+            arp_record ar;
+            ar.mac = row["mac"].as<std::string>();
+            ar.ip = row["ip"].as<std::string>();
+            ar.iface = row["iface"].as<std::string>();
+            ar.tstamp = row["tstamp"].as<int>();
+            db_records.push_back(ar);
+        }
+        // Cleanup
+        w.commit();
+    } catch (std::exception const &e) {
+        std::cerr << "ERROR: " << e.what() << '\n';
+        db_records.clear();
+    }
+    return db_records;
+}
+
+int insert_record(pqxx::connection *conn, arp_record &ar) {
+    try {
+        conn->prepare("insert_query", ARP_INSERT_SQL_QUERY);
+        pqxx::work w{*conn};
+        pqxx::result res = w.exec_prepared0("insert_query", ar.mac, ar.ip, ar.iface, ar.tstamp);
         w.commit();
         return 0;
     } catch (std::exception const &e) {
