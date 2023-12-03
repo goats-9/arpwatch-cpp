@@ -18,7 +18,8 @@ find_package(CURL REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 # Add files to build here
-set(src_files 
+set(src_files
+  arp_checks.cpp  
   mysql_interface.cpp
   send_mail.cpp
 )

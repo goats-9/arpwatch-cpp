@@ -35,8 +35,8 @@ void send_email(const std::string &to, const std::string &subject, const std::st
     }
 }
 
-int main()
-{
-    send_email("recipient@example.com", "Test Subject", "This is a test email from arpwatch-cpp.");
-    return 0;
-}
+// int main()
+// {
+//     send_email("recipient@example.com", "Test Subject", "This is a test email from arpwatch-cpp.");
+//     return 0;
+// }
