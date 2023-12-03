@@ -33,7 +33,7 @@ std::vector<arp_record> retrieve_record_by_mac(pqxx::connection *conn, std::stri
             ar.mac = row["mac"].as<std::string>();
             ar.ip = row["ip"].as<std::string>();
             ar.iface = row["iface"].as<std::string>();
-            ar.tstamp = row["tstamp"].as<int>();
+            ar.tstamp = row["tstamp"].as<std::time_t>();
             db_records.push_back(ar);
         }
         // Cleanup
@@ -57,7 +57,7 @@ std::vector<arp_record> retrieve_record_by_ip(pqxx::connection *conn, std::strin
             ar.mac = row["mac"].as<std::string>();
             ar.ip = row["ip"].as<std::string>();
             ar.iface = row["iface"].as<std::string>();
-            ar.tstamp = row["tstamp"].as<int>();
+            ar.tstamp = row["tstamp"].as<std::time_t>();
             db_records.push_back(ar);
         }
         // Cleanup
@@ -81,7 +81,7 @@ std::vector<arp_record> retrieve_record_by_mac_ip(pqxx::connection *conn, std::s
             ar.mac = row["mac"].as<std::string>();
             ar.ip = row["ip"].as<std::string>();
             ar.iface = row["iface"].as<std::string>();
-            ar.tstamp = row["tstamp"].as<int>();
+            ar.tstamp = row["tstamp"].as<std::time_t>();
             db_records.push_back(ar);
         }
         // Cleanup
