@@ -164,11 +164,12 @@ void listenPCAP(const char *dev_name)
     if (pcap_setfilter(handle, &filter) == -1)
     {
         fprintf(stderr, "ERROR: %s\n", pcap_geterr(handle));
-        exit(1);
     }
-
-    // The 100 here shows that it will terminate after listening to 100 packets. Can be changed.
-    pcap_loop(handle, 10, packetHandler, (u_char *)&packet_info);
+    else
+    {
+        // The 100 here shows that it will terminate after listening to 100 packets. Can be changed.
+        pcap_loop(handle, 10, packetHandler, (u_char *)&packet_info);
+    }
 
     // Close the handle
     pcap_close(handle);

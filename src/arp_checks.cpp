@@ -70,7 +70,7 @@ bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
     {
         string message = 
             "Ethernet address for ip " + record.ip + " changed from " + old_recs[0].mac + " to " + record.mac +
-            " on interface " + record.iface + " at " + string(ctime(&record.tstamp));
+            " on interface " + record.iface + " at " + ctime(&record.tstamp);
         ;
         arp_log(LOG_INFO,message);
         send_email("ARPWATCH", message);
