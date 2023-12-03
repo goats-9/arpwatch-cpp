@@ -60,6 +60,4 @@ void send_email(const std::string &sub, const std::string &body) {
         curl_slist_free_all(recipients);
         curl_easy_cleanup(curl);
     }
-
-    // return (int)res;
 }
