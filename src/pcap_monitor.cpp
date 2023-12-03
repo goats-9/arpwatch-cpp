@@ -24,7 +24,7 @@ void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddres
     const uint8_t *targetProtocolAddr = targetHardwareAddr + hardwareAddrLength;
 
     ArpAddresses addresses;
-    
+
     // Convert MAC addresses to string
     for (int i = 0; i < hardwareAddrLength; ++i) {
         char buffer[3];
@@ -48,32 +48,28 @@ void processArpPacket(const u_char *packet, std::vector<ArpAddresses> &arpAddres
     arpAddresses.push_back(addresses);
 }
 
-void packetHandler(unsigned char* user, const struct pcap_pkthdr* pkthdr, const unsigned char* packet, std::vector<ArpAddresses> &arpAddresses) {
+void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const unsigned char *packet, std::vector<ArpAddresses> &arpAddresses) {
     // Callback function for pcap_loop
     if (*(uint16_t *)(packet + 12) == ntohs(0x0806)) {
         processArpPacket(packet, arpAddresses);
     }
 }
 
-std::vector<ArpAddresses> listenPCAP(const char* interface) {
+std::vector<ArpAddresses> listenPCAP() {
     std::vector<ArpAddresses> arpAddresses;
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
 
     // Open a pcap session on the network interface
-    handle = pcap_open_live(interface, BUFSIZ, 1, 1000, errbuf);
+    handle = pcap_open_live(nullptr, BUFSIZ, 1, 1000, errbuf);
 
     if (handle == nullptr) {
-        fprintf(stderr, "Could not open device %s: %s\n", interface, errbuf);
+        fprintf(stderr, "Could not open device: %s\n", errbuf);
         return arpAddresses;
     }
 
-    if (pcap_datalink(handle) == DLT_EN10MB || pcap_datalink(handle) == DLT_IEEE802_11) {
-        pcap_loop(handle, 0, packetHandler, reinterpret_cast<unsigned char*>(&arpAddresses));
-    } else {
-        std::cerr << "Unsupported link-layer type" << std::endl;
-    }
-
+    // The 100 here shows that it will terminate after listening to 100 packets. Can be changed.
+    pcap_loop(handle, 100, packetHandler, reinterpret_cast<unsigned char *>(&arpAddresses));
     // Close the handle
     pcap_close(handle);
 
@@ -91,9 +87,10 @@ std::vector<ArpAddresses> extractARP() {
         return arpAddresses;
     }
 
-    // just for funzies, take the second device
-    if (alldevs != NULL && alldevs->next != NULL) {
-        arpAddresses = listenPCAP(alldevs->next->name);
+    // iterate through all available interfaces
+    for (dev = alldevs; dev != NULL; dev = dev->next) {
+        std::vector<ArpAddresses> addressesOnInterface = listenPCAP();
+        arpAddresses.insert(arpAddresses.end(), addressesOnInterface.begin(), addressesOnInterface.end());
     }
 
     pcap_freealldevs(alldevs);
@@ -105,7 +102,7 @@ int main() {
     std::vector<ArpAddresses> addresses = extractARP();
 
     // Display the results
-    for (const auto& addr : addresses) {
+    for (const auto &addr : addresses) {
         std::cout << "Sender IP: " << addr.senderIp << ", Sender MAC: " << addr.senderMac << std::endl;
         std::cout << "Target IP: " << addr.targetIp << ", Target MAC: " << addr.targetMac << std::endl;
         std::cout << std::endl;
