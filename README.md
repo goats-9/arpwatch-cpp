@@ -47,4 +47,4 @@ The database has one table `arp_records`. Its schema is as follows (`mac` shall 
 | ip | string |
 | interface | string |
 | mac | string |
-| time | timestamp |
+| tstamp | timestamp |
