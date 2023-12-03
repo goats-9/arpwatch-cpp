@@ -90,36 +90,41 @@ void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const 
     /* If is Ethernet and IPv4, print packet contents */
     if (ntohs(arpheader->htype) == 1 && ntohs(arpheader->ptype) == 0x0800)
     {
-        // printf("Sender MAC: ");
+        printf("Sender MAC: ");
 
-        // for (int i = 0; i < 6; i++)
-        //     printf("%02X:", arpheader->sha[i]);
+        for (int i = 0; i < 6; i++)
+            printf("%02X:", arpheader->sha[i]);
 
-        // printf("\nSender IP: ");
+        printf("\nSender IP: ");
 
-        // for (int i = 0; i < 4; i++)
-        //     printf("%d.", arpheader->spa[i]);
+        for (int i = 0; i < 4; i++)
+            printf("%d.", arpheader->spa[i]);
 
-        // printf("\nTarget MAC: ");
+        printf("\nTarget MAC: ");
 
         for (int i = 0; i < 6; i++)
         {
-            sprintf(temp,"%02X:", arpheader->tha[i]);
+            sprintf(temp, "%02X:", arpheader->tha[i]);
             t_mac = temp + t_mac;
         }
-        // std::cout << t_mac;
+        std::cout << t_mac;
 
-        // printf("\nTarget IP: ");
+        printf("\nTarget IP: ");
 
         for (int i = 0; i < 4; i++)
         {
-            sprintf(temp,"%d.", arpheader->tpa[i]);
+            sprintf(temp, "%d.", arpheader->tpa[i]);
             t_ip = temp + t_ip;
         }
-        packet_info->ip = t_ip;
-        packet_info->mac = t_mac;
-        packet_info->tstamp = pkthdr->ts.tv_sec;
-        update_and_check_records(*packet_info);
+        std::cout << t_ip;
+
+        if ((ntohs(arpheader->oper) == ARP_REPLY))
+        {
+            packet_info->ip = t_ip;
+            packet_info->mac = t_mac;
+            packet_info->tstamp = pkthdr->ts.tv_sec;
+            update_and_check_records(*packet_info);
+        }
     }
 }
 
