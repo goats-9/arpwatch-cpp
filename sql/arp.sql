@@ -1,5 +1,5 @@
 -- Create the table
-CREATE OR REPLACE TABLE arp_records (
+CREATE TABLE IF NOT EXISTS arp_records (
     mac VARCHAR(17) NOT NULL,
     ip VARCHAR(64),
     iface VARCHAR(50),
