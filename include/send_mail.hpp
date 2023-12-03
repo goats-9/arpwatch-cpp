@@ -10,6 +10,6 @@
  * @brief Send email to recipient with a subject and body.
  * @param sub Subject of the email.
  * @param body Body of the email.
- * @return 0 if successful, nonzero otherwise.
+ * @return `void`
 */
-int send_email(const std::string &sub, const std::string &body);
+void send_email(const std::string &sub, const std::string &body);
