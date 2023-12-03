@@ -26,7 +26,7 @@ struct arp_record {
     /// @brief IP address
     std::string ip;
     /// @brief Timestamp
-    int tstamp;
+    std::time_t tstamp;
 };
 
 /**
