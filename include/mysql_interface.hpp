@@ -1,8 +1,3 @@
-/**
- * File     : mysql_interface.hpp
- * Purpose  : Header file exposing APIs for MySQL db
-*/
-
 #pragma once
 
 /* C++ STL header files */
