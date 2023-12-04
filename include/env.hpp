@@ -1,2 +1,2 @@
-#define ADMIN_EMAIL "abc@gmail.com"
-#define PASSWORD "passwd"
+#define ADMIN_EMAIL "anshul.sangrame@gmail.com"
+#define PASSWORD "pnihlwblzurhresv"
