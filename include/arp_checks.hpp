@@ -10,7 +10,7 @@
 #define STATUS_FLIP_FLOP 2
 #define STATUS_NEW_MAC 3
 
-#define NEWACTIVITY_DELTA (6*30*24*60*60)	/* 6 months in seconds */
+#define NEWACTIVITY_DELTA (20)	/* 20 seconds */
 #define FLIPFLIP_DELTA (24*60*60)		/* 24 hours in seconds */
 
 // std::map<std::string, ArpRecord> records;

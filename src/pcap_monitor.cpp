@@ -90,33 +90,33 @@ void packetHandler(unsigned char *user, const struct pcap_pkthdr *pkthdr, const 
     /* If is Ethernet and IPv4, print packet contents */
     if (ntohs(arpheader->htype) == 1 && ntohs(arpheader->ptype) == 0x0800)
     {
-        printf("Sender MAC: ");
+        std::cout << "Sender MAC: ";
 
         for (int i = 0; i < 6; i++)
             printf("%02X:", arpheader->sha[i]);
 
-        printf("\nSender IP: ");
+        std::cout << "\nSender IP: ";
 
         for (int i = 0; i < 4; i++)
             printf("%d.", arpheader->spa[i]);
 
-        printf("\nTarget MAC: ");
+        std::cout << "\nTarget MAC: ";
 
         for (int i = 0; i < 6; i++)
         {
             sprintf(temp, "%02X:", arpheader->tha[i]);
-            t_mac = temp + t_mac;
+            t_mac = t_mac + temp;
         }
         std::cout << t_mac;
 
-        printf("\nTarget IP: ");
+        std::cout << "\nTarget IP: ";
 
         for (int i = 0; i < 4; i++)
         {
             sprintf(temp, "%d.", arpheader->tpa[i]);
-            t_ip = temp + t_ip;
+            t_ip = t_ip + temp;
         }
-        std::cout << t_ip;
+        std::cout << t_ip << "\n";
 
         if ((ntohs(arpheader->oper) == ARP_REPLY))
         {
@@ -175,25 +175,26 @@ void listenPCAP(const char *dev_name)
     pcap_close(handle);
 }
 
-void extractARP()
+void extractARP(const char * dev_name)
 {
-    std::vector<ArpAddresses> arpAddresses;
-    char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_if_t *alldevs, *dev;
+    // std::vector<ArpAddresses> arpAddresses;
+    // char errbuf[PCAP_ERRBUF_SIZE];
+    // pcap_if_t *alldevs, *dev;
 
-    // this gives the list of all devices
-    if (pcap_findalldevs(&alldevs, errbuf) == -1)
-    {
-        fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
-        exit(1);
-    }
+    // // this gives the list of all devices
+    // if (pcap_findalldevs(&alldevs, errbuf) == -1)
+    // {
+    //     fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
+    //     exit(1);
+    // }
 
-    // iterate through all available interfaces
-    for (dev = alldevs; dev != NULL; dev = dev->next)
-    {
-        std::cout << "listening " << dev->name << "\n";
-        listenPCAP(dev->name);
-    }
+    listenPCAP(dev_name);
+    // // iterate through all available interfaces
+    // for (dev = alldevs; dev != NULL; dev = dev->next)
+    // {
+    //     std::cout << "listening " << dev->name << "\n";
+    //     listenPCAP(dev->name);
+    // }
 
-    pcap_freealldevs(alldevs);
+    // pcap_freealldevs(alldevs);
 }

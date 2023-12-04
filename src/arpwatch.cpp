@@ -6,6 +6,11 @@ void exit_handler(int s) {
 }
 
 int main(int argc, char *argv[]) {
+    if (argc != 2)
+    {
+        std::cout << "Usage: ./arpwatch <interface>\n";
+        return 0;
+    }
     // Define signal handler
     struct sigaction sigIntHandler;
 
@@ -16,7 +21,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     // Main code goes here
-    while (1) extractARP();
+    while (1) extractARP(argv[1]);
 
     return 0;
 }

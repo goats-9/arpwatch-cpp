@@ -2,6 +2,7 @@
 #include "send_mail.hpp"
 #include "syslog_interface.hpp"
 #include "env.hpp"
+#include <iostream>
 using namespace std;
 
 // Check functions
@@ -19,6 +20,7 @@ bool new_station(pqxx::connection *conn, arp_record &record)
             "\ninterface: " + record.iface +
             "\ntime: " + ctime(&record.tstamp);
         // arp_log(LOG_INFO, "New station found with ip " + record.ip + " and mac address " + record.mac + " at " + ctime(&record.tstamp));
+        cout << body << "\n";
         arp_log(LOG_INFO,body);
         send_email("ARPWATCH", body);
         return true;
@@ -33,10 +35,11 @@ bool flip_flop(pqxx::connection *conn, arp_record &record)
     if (old_recs.size() == 2 && record.ip == old_recs[1].ip)
     {
         string message =
-            "Flip flop found between " + record.ip + ", " + old_recs[1].ip +
+            "Flip flop found between " + record.ip + ", " + old_recs[0].ip +
             " for mac address " + record.mac + " on interface " + record.iface +
             " at " + ctime(&record.tstamp);
         arp_log(LOG_INFO, message);
+        cout << message << "\n";
         send_email("ARPWATCH", message);
         return true;
     }
@@ -47,7 +50,7 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
 {
     vector<arp_record> old_recs = retrieve_record_by_mac_ip(conn, record.mac, record.ip);
 
-    if (!old_recs.empty() && record.tstamp - old_recs[0].tstamp <= NEWACTIVITY_DELTA)
+    if (!old_recs.empty() && record.tstamp - old_recs[0].tstamp > NEWACTIVITY_DELTA)
     {
         // update recode here
         string body =
@@ -56,6 +59,7 @@ bool new_activity(pqxx::connection *conn, arp_record &record)
             "\ntime: " + ctime(&record.tstamp);
         // arp_log(LOG_INFO, "New activity found from ip " + record.ip + " with mac address " + record.mac + " at " + ctime(&record.tstamp));
         arp_log(LOG_INFO,body);
+        cout << body << "\n";
         send_email("ARPWATCH", body);
         return true;
     }
@@ -71,16 +75,19 @@ bool changed_ethernet_address(pqxx::connection *conn, arp_record &record)
         string message = 
             "Ethernet address for ip " + record.ip + " changed from " + old_recs[0].mac + " to " + record.mac +
             " on interface " + record.iface + " at " + ctime(&record.tstamp);
-        ;
+        
         arp_log(LOG_INFO,message);
+        cout << message << "\n";
         send_email("ARPWATCH", message);
         return true;
     }
+    return false;
 }
 
 void update_and_check_records(arp_record &new_record)
 {
     pqxx::connection *conn = db_session_init();
+    
     if (new_station(conn, new_record))
     {
         insert_record(conn, new_record);
